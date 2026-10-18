@@ -71,7 +71,6 @@ function NewRequest() {
   const chosenVenue = options.find((v) => v.id === chosen);
   const equipmentList = chosenVenue?.equipment ?? [];
   const [equipment, setEquipment] = useState<string[]>([]);
-  const [otherOn, setOtherOn] = useState(false);
   const [otherText, setOtherText] = useState("");
   const [form, setForm] = useState({
     organization: "",
@@ -95,7 +94,7 @@ function NewRequest() {
         slots.map((x) => ({
           ...form,
           equipment: equipment.filter((x) => equipmentList.includes(x)),
-          equipment_other: otherOn && otherText.trim() ? otherText.trim() : null,
+          equipment_other: otherText.trim() ? otherText.trim() : null,
           contact_email: form.contact_email || user.email || null,
           venue_id: chosen,
           user_id: user.id,
@@ -185,14 +184,16 @@ function NewRequest() {
                 {item}
               </label>
             ))}
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" className="h-4 w-4 accent-primary" checked={otherOn} onChange={(e) => setOtherOn(e.target.checked)} />
-              Inne
-            </label>
           </div>
-          {otherOn && (
-            <Input aria-label="Inne wyposażenie" placeholder="Opisz, czego potrzebujesz" value={otherText} onChange={(e) => setOtherText(e.target.value)} />
-          )}
+          <div className="grid gap-2">
+            <Label htmlFor="other-eq">Inne</Label>
+            <Input
+              id="other-eq"
+              placeholder="Opisz, czego jeszcze potrzebujesz"
+              value={otherText}
+              onChange={(e) => setOtherText(e.target.value)}
+            />
+          </div>
         </fieldset>
         <Field label="Opis" id="ds"><Textarea id="ds" rows={4} value={form.description} onChange={set("description")} /></Field>
         <div className="flex gap-3">
