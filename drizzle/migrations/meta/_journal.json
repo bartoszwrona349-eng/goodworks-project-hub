@@ -50,6 +50,13 @@
       "when": 1792314568292,
       "tag": "0006_apply_repo_migrations",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792314927676,
+      "tag": "0007_only_approved_blocks_slots",
+      "breakpoints": true
     }
   ]
 }
