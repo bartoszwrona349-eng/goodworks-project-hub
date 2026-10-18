@@ -53,7 +53,7 @@ function NewRequest() {
     enabled: slots.length > 0,
     queryFn: async () => {
       const [{ data: v }, { data: busy }] = await Promise.all([
-        supabase.from("venues").select("id,name,capacity").order("capacity"),
+        supabase.from("venues").select("id,name,capacity,equipment").order("capacity"),
         supabase.rpc("get_busy_slots", { _from: minStart!.toISOString(), _to: maxEnd!.toISOString() }),
       ]);
       const taken = new Set(
@@ -68,6 +68,11 @@ function NewRequest() {
   const options = (venues.data ?? []).filter((v) => v.free && (s.venue ? v.id === s.venue : v.capacity >= (s.n ?? 1)));
   const [venueId, setVenueId] = useState<string | undefined>(s.venue);
   const chosen = venueId ?? options[0]?.id;
+  const chosenVenue = options.find((v) => v.id === chosen);
+  const equipmentList = chosenVenue?.equipment ?? [];
+  const [equipment, setEquipment] = useState<string[]>([]);
+  const [otherOn, setOtherOn] = useState(false);
+  const [otherText, setOtherText] = useState("");
   const [form, setForm] = useState({
     organization: "",
     event_name: "",
