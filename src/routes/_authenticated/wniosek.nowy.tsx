@@ -53,7 +53,7 @@ function NewRequest() {
     enabled: slots.length > 0,
     queryFn: async () => {
       const [{ data: v }, { data: busy }] = await Promise.all([
-        supabase.from("venues").select("id,name,capacity").order("capacity"),
+        supabase.from("venues").select("id,name,capacity,equipment").order("capacity"),
         supabase.rpc("get_busy_slots", { _from: minStart!.toISOString(), _to: maxEnd!.toISOString() }),
       ]);
       const taken = new Set(
@@ -68,6 +68,11 @@ function NewRequest() {
   const options = (venues.data ?? []).filter((v) => v.free && (s.venue ? v.id === s.venue : v.capacity >= (s.n ?? 1)));
   const [venueId, setVenueId] = useState<string | undefined>(s.venue);
   const chosen = venueId ?? options[0]?.id;
+  const chosenVenue = options.find((v) => v.id === chosen);
+  const equipmentList = chosenVenue?.equipment ?? [];
+  const [equipment, setEquipment] = useState<string[]>([]);
+  const [otherOn, setOtherOn] = useState(false);
+  const [otherText, setOtherText] = useState("");
   const [form, setForm] = useState({
     organization: "",
     event_name: "",
@@ -89,6 +94,8 @@ function NewRequest() {
       .insert(
         slots.map((x) => ({
           ...form,
+          equipment: equipment.filter((x) => equipmentList.includes(x)),
+          equipment_other: otherOn && otherText.trim() ? otherText.trim() : null,
           contact_email: form.contact_email || user.email || null,
           venue_id: chosen,
           user_id: user.id,
@@ -163,6 +170,30 @@ function NewRequest() {
           <Field label="E-mail kontaktowy" id="ce"><Input id="ce" type="email" value={form.contact_email} onChange={set("contact_email")} /></Field>
         </div>
         <Field label="Liczba uczestników" id="pp"><Input id="pp" type="number" min={1} required value={form.participants} onChange={set("participants")} /></Field>
+        <fieldset className="grid gap-2">
+          <legend className="mb-2 text-sm font-medium">Potrzebne wyposażenie</legend>
+          {equipmentList.length === 0 && <p className="text-sm text-muted-foreground">Ten obiekt nie ma wpisanego wyposażenia.</p>}
+          <div className="grid gap-2 sm:grid-cols-2">
+            {equipmentList.map((item) => (
+              <label key={item} className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 accent-primary"
+                  checked={equipment.includes(item)}
+                  onChange={(e) => setEquipment(e.target.checked ? [...equipment, item] : equipment.filter((x) => x !== item))}
+                />
+                {item}
+              </label>
+            ))}
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" className="h-4 w-4 accent-primary" checked={otherOn} onChange={(e) => setOtherOn(e.target.checked)} />
+              Inne
+            </label>
+          </div>
+          {otherOn && (
+            <Input aria-label="Inne wyposażenie" placeholder="Opisz, czego potrzebujesz" value={otherText} onChange={(e) => setOtherText(e.target.value)} />
+          )}
+        </fieldset>
         <Field label="Opis" id="ds"><Textarea id="ds" rows={4} value={form.description} onChange={set("description")} /></Field>
         <div className="flex gap-3">
           <Button type="submit" disabled={busy || !chosen}>Wyślij wniosek</Button>

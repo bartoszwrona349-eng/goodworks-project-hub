@@ -174,6 +174,12 @@ function Detail() {
         </div>
         <Item k="Uczestnicy" v={String(b.participants)} />
         <Item k="Kontakt" v={[b.contact_name, b.contact_email].filter(Boolean).join(" · ") || "—"} />
+        <div className="sm:col-span-2">
+          <Item
+            k="Wyposażenie"
+            v={[...(b.equipment ?? []), ...(b.equipment_other ? [`Inne: ${b.equipment_other}`] : [])].join(", ") || "—"}
+          />
+        </div>
         <div className="sm:col-span-2"><Item k="Opis" v={b.description || "—"} /></div>
         {b.status === "rejected" && b.rejection_reason && (
           <div className="sm:col-span-2"><Item k="Uzasadnienie odrzucenia" v={b.rejection_reason} /></div>

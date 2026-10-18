@@ -57,6 +57,13 @@
       "when": 1792314927676,
       "tag": "0007_only_approved_blocks_slots",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792315567949,
+      "tag": "0008_booking_equipment",
+      "breakpoints": true
     }
   ]
 }
